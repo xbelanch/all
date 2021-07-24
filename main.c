@@ -7,27 +7,42 @@ typedef struct node {
 } Node;
 
 typedef struct list {
-    Node *firstNode;
+    Node *head;
 } List;
 
-Node *newNode(size_t data) {
+Node *newNode() {
     Node *node = malloc(sizeof(Node));
-    node->data = data;
-    node->next = NULL;
     return node;
 }
 
-List *list;
+Node *addNode(List *list, size_t data) {
+    Node *node, *p;
+    node = newNode();
+    node->data = data;
+    node->next = NULL;
+    if (list->head == NULL) {
+        list->head = node;
+    } else {
+        p = list->head;
+        while (p->next != NULL) {
+            p = p->next;
+        }
+        p->next = node;
+    }
+    return node;
+}
+
 
 int main(int argc, char *argv[])
 {
     (void)argc;
     (void)argv[0];
 
-    list = malloc(sizeof(List));
-    list->firstNode = newNode(0);
-    Node *node = list->firstNode;
+    List *list = malloc(sizeof(List));
+    addNode(list, 0x10);
+    addNode(list, 0x100);
 
+    Node *node = list->head;
     while (NULL != node) {
         fprintf(stdout, "data: %lu\n", node->data);
         node = node->next;
