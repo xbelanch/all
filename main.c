@@ -93,6 +93,31 @@ Node *insert_after(List *list, Node *prev, size_t data) {
     }
 }
 
+Node *insert_before(List *list, Node *next, size_t data) {
+    Node *cursor = list->head;
+    Node *prev = NULL;
+    while (cursor != next) {
+        prev = cursor;
+        cursor = cursor->next;
+    }
+
+    if (cursor != NULL) {
+        Node *node = newNode(data);
+        if (prev == NULL) {
+            // next equals to head list
+            node->next = cursor;
+            list->head = node;
+            return list->head;
+        } else {
+            node->next = cursor;
+            prev->next = node;
+            return node;
+        }
+    } else {
+        return NULL;
+    }
+}
+
 Node *search(List *list, size_t data) {
     Node *cursor = list->head;
     while (cursor != NULL) {
@@ -115,41 +140,12 @@ void traverse(List *list, callback func)
 }
 
 void printNode(Node *node) {
-    fprintf(stdout, "data: %lu\n", node->data);
+    if (node == NULL) {
+        fprintf(stderr, "Node with this data not found!\n");
+    } else {
+        fprintf(stdout, "data: %lu\n", node->data);
+    }
 }
-
-// Node *findNode(List *list, size_t data) {
-//     if (NULL == list)
-//         return NULL;
-//     Node *p = list->head;
-//     while (p->next != NULL) {
-//         p = p->next;
-//         if (p->data == data)
-//             return p;
-//     }
-
-//     return NULL;
-// }
-
-
-// // void insertAtBeginning(List *list, Node *this) {
-
-// // }
-
-// void removeAfter(Node *this) {
-//     Node *remove = this->next;
-//     this->next = this->next->next;
-//     free(remove);
-// }
-
-// void printNode(Node *node) {
-//     if (NULL == node) {
-//         fprintf(stderr, "Node with this data not found!\n");
-//     } else {
-//         fprintf(stdout, "data: %lu\n", node->data);
-//     }
-// }
-
 
 int main(int argc, char *argv[])
 {
@@ -166,6 +162,8 @@ int main(int argc, char *argv[])
     add(list, 99);
     insert_after(list, list->head, 33);
     insert_after(list, list->tail, 22);
+    insert_before(list, list->head, 100);
+    insert_before(list, search(list, 33), 33);
     traverse(list, printNode);
     fprintf(stdout, "Head value: %lu\n", list->head->data);
     fprintf(stdout, "Tail value: %lu\n", list->tail->data);
