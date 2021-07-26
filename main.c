@@ -130,6 +130,44 @@ Node *search(List *list, size_t data) {
     return NULL;
 }
 
+// Sort a linked list using insertion sort
+// Robbed at the moment from https://www.learnc.net/c-data-structures/c-linked-list/
+// TODO: Fix list tail point to the right node
+Node* sort(List *list)
+{
+    Node *x, *y, *e;
+
+    x = list->head;
+    list->head = NULL;
+    list->tail = NULL;
+
+    while(x != NULL) {
+        e = x;
+        x = x->next;
+        if (list->head != NULL) {
+            if(e->data > list->head->data) {
+                y = list->head;
+                list->tail = e;
+                while ((y->next != NULL) && (e->data > y->next->data)) {
+                    y = y->next;
+                }
+                e->next = y->next;
+                y->next = e;
+            }
+            else {
+                e->next = list->head;
+                list->head = e ;
+            }
+        }
+        else {
+            e->next = NULL;
+            list->head = e;
+        }
+    }
+    return list->head;
+}
+
+
 void traverse(List *list, callback func)
 {
     Node* cursor = list->head;
@@ -159,11 +197,13 @@ int main(int argc, char *argv[])
 
     pop(list);
     push(list, 12);
-    add(list, 99);
-    insert_after(list, list->head, 33);
+    add(list, 1000);
+    insert_after(list, list->head, 330);
     insert_after(list, list->tail, 22);
-    insert_before(list, list->head, 100);
-    insert_before(list, search(list, 33), 33);
+    insert_before(list, list->head, 101);
+    insert_before(list, search(list, 330), 33);
+
+    sort(list);
     traverse(list, printNode);
     fprintf(stdout, "Head value: %lu\n", list->head->data);
     fprintf(stdout, "Tail value: %lu\n", list->tail->data);
