@@ -12,6 +12,8 @@ typedef struct list {
     size_t n;
 } List;
 
+typedef void (*callback)(Node* data); // ok guys
+
 List *newList() {
     List *list = malloc(sizeof(List));
     list->head = NULL;
@@ -70,14 +72,39 @@ int delete(List *list) {
     return pop(list);
 }
 
-void listScan(List *list) {
-    Node *node = list->head;
-    while (NULL != node) {
-        fprintf(stdout, "data: %lu\n", node->data);
-        node = node->next;
+Node *insert_after(List *list, Node *prev, size_t data) {
+    Node *cursor = list->head;
+    while (cursor != prev) {
+        cursor = cursor->next;
+    }
+
+    if (cursor != NULL) {
+        Node *node = newNode(data);
+        if (cursor->next != NULL) {
+            node->next = cursor->next->next;
+            cursor->next = node;
+        } else {
+            list->tail->next = node;
+            list->tail = node;
+        }
+        return node;
+    } else {
+        return NULL;
     }
 }
 
+void traverse(List *list, callback func)
+{
+    Node* cursor = list->head;
+    while(cursor != NULL) {
+        func(cursor);
+        cursor = cursor->next;
+    }
+}
+
+void printNode(Node *node) {
+    fprintf(stdout, "data: %lu\n", node->data);
+}
 
 // Node *findNode(List *list, size_t data) {
 //     if (NULL == list)
@@ -92,10 +119,6 @@ void listScan(List *list) {
 //     return NULL;
 // }
 
-// void insertAfter(Node *this, Node *that) {
-//     that->next = this->next;
-//     this->next = that;
-// }
 
 // // void insertAtBeginning(List *list, Node *this) {
 
@@ -123,15 +146,17 @@ int main(int argc, char *argv[])
 
     List *list = newList();
 
-    for (size_t i = 0; i < 5; ++i)
+    for (size_t i = 3; i < 7; ++i)
         add(list, i);
 
-    fprintf(stdout, "size: %lu\n", list->n);
     pop(list);
-    fprintf(stdout, "size: %lu\n", list->n);
     push(list, 12);
-    fprintf(stdout, "size: %lu\n", list->n);
     add(list, 99);
-    listScan(list);
+    insert_after(list, list->head, 33);
+    insert_after(list, list->tail, 22);
+    traverse(list, printNode);
+    fprintf(stdout, "Head value: %lu\n", list->head->data);
+    fprintf(stdout, "Tail value: %lu\n", list->tail->data);
+    free(list);
     return 0;
 }
