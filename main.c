@@ -93,6 +93,18 @@ Node *insert_after(List *list, Node *prev, size_t data) {
     }
 }
 
+Node *search(List *list, size_t data) {
+    Node *cursor = list->head;
+    while (cursor != NULL) {
+        if (cursor->data == data) {
+            return cursor;
+        }
+        cursor = cursor->next;
+    }
+
+    return NULL;
+}
+
 void traverse(List *list, callback func)
 {
     Node* cursor = list->head;
