@@ -81,12 +81,14 @@ Node *insert_after(List *list, Node *prev, size_t data) {
     if (cursor != NULL) {
         Node *node = newNode(data);
         if (cursor->next != NULL) {
-            node->next = cursor->next->next;
-            cursor->next = node;
+            node->next = prev->next;
+            prev->next = node;
+
         } else {
             list->tail->next = node;
             list->tail = node;
         }
+        list->n++;
         return node;
     } else {
         return NULL;
@@ -103,6 +105,7 @@ Node *insert_before(List *list, Node *next, size_t data) {
 
     if (cursor != NULL) {
         Node *node = newNode(data);
+        list->n++;
         if (prev == NULL) {
             // next equals to head list
             node->next = cursor;
@@ -192,7 +195,7 @@ int main(int argc, char *argv[])
 
     List *list = newList();
 
-    for (size_t i = 3; i < 7; ++i)
+    for (size_t i = 0; i < 5; ++i)
         add(list, i);
 
     pop(list);
@@ -207,6 +210,7 @@ int main(int argc, char *argv[])
     traverse(list, printNode);
     fprintf(stdout, "Head value: %lu\n", list->head->data);
     fprintf(stdout, "Tail value: %lu\n", list->tail->data);
+    fprintf(stdout, "Length of list: %lu\n", list->n);
     free(list);
     return 0;
 }
