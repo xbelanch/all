@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 typedef struct node {
     size_t data;
@@ -149,101 +150,67 @@ void printNode(Node *node) {
         fprintf(stderr, "Node with this data not found!\n");
     } else {
         fprintf(stdout, "data: %lu\n", node->data);
-        if (node->next != NULL)  {
-            fprintf(stdout, "\tnext data: %lu\n", node->next->data);
-        } else {
-            fprintf(stdout, "\tnext data is NULL\n");
-        }
     }
 }
 
-Node *find_at_index(List *list, size_t index) {
-    if (index > list->n)
-        return NULL;
+void midList(Node *head, Node **frontNode, Node **backNode) {
+    Node *slow = head;
+    Node *fast = head->next;
 
-    size_t n = 0;
-    Node *cursor = list->head;
-    while (cursor != NULL) {
-        if (n == index) {
-            return cursor;
+    while (fast != NULL) {
+        fast = fast->next;
+        if (fast != NULL) {
+            slow = slow->next;
+            fast = fast->next;
         }
-        cursor = cursor->next;
-        n++;
+    }
+    // slow is at the midpoint in the list
+    *frontNode = head;
+    *backNode = slow->next;
+    slow->next = NULL;
+}
+
+Node *sortMerge(Node *frontNode, Node *backNode) {
+
+    Node *result = NULL;
+
+    if (frontNode == NULL)
+        return (backNode);
+    else if (backNode == NULL)
+        return (frontNode);
+
+    if (frontNode->data <= backNode->data) {
+        result = frontNode;
+        result->next = sortMerge(frontNode->next, backNode);
+        // if (result->next->next == NULL)
+        //     printNode(result->next);
+    } else {
+        result = backNode;
+        result->next = sortMerge(frontNode, backNode->next);
     }
 
-    return NULL;
+
+    return (result);
 }
 
 // Merge sort algorithm
-List *merge_sort(List *list) {
-    if (list->n <= 1)
-        return list;
-    printf("+++++++++++++++++++++\n");
-    printf("LEFT ----\n");
-    // left half list
-    Node *start = list->head;
-    Node *pointer = start;
-    Node *end= find_at_index(list, (list->n / 2));
-    List *leftList = newList();
-    while (pointer != end) {
-        add(leftList, pointer->data);
-        pointer = pointer->next;
-    }
-    // add(leftList, end->data);
-    traverse(leftList, printNode);
-    printf("RIGHT ----\n");
+void merge_sort(Node **headRef) {
 
-    // right halft list
-    start = end;
-    pointer = start;
-    List *rightList = newList();
-    while (pointer != NULL) {
-        add(rightList, pointer->data);
-        pointer = pointer->next;
-    }
-    traverse(rightList, printNode);
+    Node *head = *headRef;
+    Node *frontNode;
+    Node *backNode;
 
-    merge_sort(leftList);
-    merge_sort(rightList);
+    // Base case -- length 0 or 1;
+    if (head == NULL || head->next == NULL)
+        return;
 
-    return NULL;
-}
+    midList(head, &frontNode, &backNode);
 
+    merge_sort(&frontNode);
+    merge_sort(&backNode);
 
-// Sort a linked list using insertion sort
-// Robbed at the moment from https://www.learnc.net/c-data-structures/c-linked-list/
-// TODO: Fix list tail point to the right node
-Node* sort(List *list)
-{
-    Node *x, *y, *e;
-
-    x = list->head;
-    list->head = NULL;
-
-    while(x != NULL) {
-        e = x;
-        x = x->next;
-        if (list->head != NULL) {
-            if(e->data > list->head->data) {
-                y = list->head;
-                while ((y->next != NULL) && (e->data > y->next->data)) {
-                    y = y->next;
-                }
-                e->next = y->next;
-                y->next = e;
-            }
-            else {
-                e->next = list->head;
-                list->head = e;
-            }
-        }
-        else {
-            e->next = NULL;
-            list->head = e;
-        }
-    }
-
-    return list->head;
+    // merge the sorted lists together
+    *headRef = sortMerge(frontNode, backNode);
 }
 
 int main(int argc, char *argv[])
@@ -253,7 +220,7 @@ int main(int argc, char *argv[])
 
     List *list = newList();
 
-    for (size_t i = 0; i < 5; ++i)
+    for (int i = 0; i <= 10; ++i)
         add(list, i);
 
     pop(list);
@@ -263,18 +230,11 @@ int main(int argc, char *argv[])
     insert_after(list, list->tail, 22);
     insert_before(list, list->head, 101);
     insert_before(list, search(list, 330), 33);
-
-    // sort(list);
+    merge_sort(&list->head);
     traverse(list, printNode);
     fprintf(stdout, "Head value: %lu\n", list->head->data);
+    assert(1000  == list->tail->data);
     fprintf(stdout, "Tail value: %lu\n", list->tail->data);
-    fprintf(stdout, "Length of list: %lu\n", list->n);
-    fprintf(stdout, "Node value at half of list: %lu\n", find_at_index(list, list->n / 2)->data);
-
-
-    //
-    printf("+++ MERGE SORTING +++\n");
-    merge_sort(list);
     free(list);
     return 0;
 }
