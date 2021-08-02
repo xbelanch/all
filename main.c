@@ -160,7 +160,6 @@ void midList(Node *head, Node **frontNode, Node **backNode) {
 }
 
 Node *sortMerge(Node *frontNode, Node *backNode) {
-
     Node *result = NULL;
 
     if (frontNode == NULL)
@@ -171,36 +170,30 @@ Node *sortMerge(Node *frontNode, Node *backNode) {
     if (frontNode->data <= backNode->data) {
         result = frontNode;
         result->next = sortMerge(frontNode->next, backNode);
-        // if (result->next->next == NULL)
-        //     printNode(result->next);
     } else {
         result = backNode;
         result->next = sortMerge(frontNode, backNode->next);
     }
 
-
     return (result);
 }
 
 // Merge sort algorithm
-void merge_sort(Node **headRef) {
-
-    Node *head = *headRef;
+void merge_sort_list(List *list) {
+    Node *head = list->head;
     Node *frontNode;
     Node *backNode;
 
-    // Base case -- length 0 or 1;
     if (head == NULL || head->next == NULL)
         return;
 
     midList(head, &frontNode, &backNode);
-
     merge_sort(&frontNode);
     merge_sort(&backNode);
 
-    // merge the sorted lists together
-    *headRef = sortMerge(frontNode, backNode);
+    list->head = sortMerge(frontNode, backNode);
 }
+
 
 int main(int argc, char *argv[])
 {
@@ -218,9 +211,10 @@ int main(int argc, char *argv[])
     insert_after(list, list->head, 330);
     insert_before(list, list->head, 101);
     insert_before(list, search(list, 330), 33);
-    merge_sort(&list->head);
+    fprintf(stdout, "Head value before merge sort: %lu\n", list->head->data);
+    merge_sort_list(list);
     traverse(list, printNode);
-    fprintf(stdout, "Head value: %lu\n", list->head->data);
+    fprintf(stdout, "Head value after merge sort: %lu\n", list->head->data);
     free(list);
     return 0;
 }
