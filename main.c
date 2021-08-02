@@ -9,7 +9,6 @@ typedef struct node {
 
 typedef struct list {
     Node *head;
-    Node *tail;
     size_t n;
 } List;
 
@@ -18,7 +17,6 @@ typedef void (*callback)(Node* data); // ok guys
 List *newList() {
     List *list = malloc(sizeof(List));
     list->head = NULL;
-    list->tail = NULL;
     list->n = 0;
     return list;
 }
@@ -34,8 +32,6 @@ int push(List *list, size_t data) {
     Node *node = newNode(data);
     node->next = list->head;
     list->head = node;
-    if (list->n == 0)
-        list->tail = node;
     list->n++;
     return 0;
 }
@@ -64,8 +60,6 @@ Node *add(List *list, size_t data) {
         }
         p->next = node;
     }
-    list->tail = node;
-    list->tail->next = NULL;
     list->n++;
     return node;
 }
@@ -85,11 +79,6 @@ Node *insert_after(List *list, Node *prev, size_t data) {
         if (cursor->next != NULL) {
             node->next = prev->next;
             prev->next = node;
-
-        } else {
-            list->tail->next = node;
-            list->tail = node;
-            list->tail->next = NULL;
         }
         list->n++;
         return node;
@@ -227,14 +216,11 @@ int main(int argc, char *argv[])
     push(list, 12);
     add(list, 1000);
     insert_after(list, list->head, 330);
-    insert_after(list, list->tail, 22);
     insert_before(list, list->head, 101);
     insert_before(list, search(list, 330), 33);
     merge_sort(&list->head);
     traverse(list, printNode);
     fprintf(stdout, "Head value: %lu\n", list->head->data);
-    assert(1000  == list->tail->data);
-    fprintf(stdout, "Tail value: %lu\n", list->tail->data);
     free(list);
     return 0;
 }
