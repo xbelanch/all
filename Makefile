@@ -8,5 +8,5 @@ INPUT=
 test: main $(INPUT)
 	./main $(INPUT)
 
-main: main.c
-	$(CC) $(CFLAGS) -o main main.c $(LIBS)
+main: main.c all.c
+	$(CC) $(CFLAGS) -o main main.c all.c $(LIBS)
