@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <assert.h>
 
+// TODO: Implement abstract data type
+// https://stackoverflow.com/questions/3274472/c-double-linked-list-with-abstract-data-type
 typedef struct node {
     size_t data;
     struct node *next;
@@ -142,7 +144,7 @@ void printNode(Node *node) {
     }
 }
 
-void midList(Node *head, Node **frontNode, Node **backNode) {
+void split_list(Node *head, Node **frontNode, Node **backNode) {
     Node *slow = head;
     Node *fast = head->next;
 
@@ -159,7 +161,7 @@ void midList(Node *head, Node **frontNode, Node **backNode) {
     slow->next = NULL;
 }
 
-Node *sortMerge(Node *frontNode, Node *backNode) {
+Node *sort_two_nodes(Node *frontNode, Node *backNode) {
     Node *result = NULL;
 
     if (frontNode == NULL)
@@ -169,29 +171,33 @@ Node *sortMerge(Node *frontNode, Node *backNode) {
 
     if (frontNode->data <= backNode->data) {
         result = frontNode;
-        result->next = sortMerge(frontNode->next, backNode);
+        result->next = sort_two_nodes(frontNode->next, backNode);
     } else {
         result = backNode;
-        result->next = sortMerge(frontNode, backNode->next);
+        result->next = sort_two_nodes(frontNode, backNode->next);
     }
 
     return (result);
 }
 
-// Merge sort algorithm
-void merge_sort_list(List *list) {
-    Node *head = list->head;
+// At this moment the code has been stolen from:
+// https://www.geeksforgeeks.org/merge-sort-for-linked-list/
+// TODO: Understand how merge sort algorithm is working
+// Maybe you can found a nice explanation at Wikipedia:
+// https://en.wikipedia.org/wiki/Merge_sort#Natural_merge_sort
+void sort(Node **headRef) {
+    Node *head = *headRef;
     Node *frontNode;
     Node *backNode;
 
     if (head == NULL || head->next == NULL)
         return;
 
-    midList(head, &frontNode, &backNode);
-    merge_sort(&frontNode);
-    merge_sort(&backNode);
+    split_list(head, &frontNode, &backNode);
+    sort(&frontNode);
+    sort(&backNode);
 
-    list->head = sortMerge(frontNode, backNode);
+    *headRef = sort_two_nodes(frontNode, backNode);
 }
 
 
@@ -212,7 +218,7 @@ int main(int argc, char *argv[])
     insert_before(list, list->head, 101);
     insert_before(list, search(list, 330), 33);
     fprintf(stdout, "Head value before merge sort: %lu\n", list->head->data);
-    merge_sort_list(list);
+    sort(&list->head);
     traverse(list, printNode);
     fprintf(stdout, "Head value after merge sort: %lu\n", list->head->data);
     free(list);
