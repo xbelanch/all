@@ -1,6 +1,24 @@
+/*
+ * Playground.c
+ * A basic sandbox for testing weird pointers and memory functions
+ *
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+typedef struct _node {
+    struct _node *next;
+    char *payload[1];
+} Node;
+
+typedef struct {
+    char *name;
+    size_t age;
+    char *first_surname;
+    char *last_surname;
+} Player;
 
 typedef struct {
     char *name;
@@ -17,6 +35,28 @@ int main(int argc, char *argv[])
     (void)argc;
     (void)argv[0];
 
+    Node *data = malloc(sizeof(Node) + sizeof(Player));
+    Player *player = &(data->payload);
+    player->age = 48;
+    player->name = "Xavier";
+    player->first_surname = "Belanche";
+    player->last_surname = "Alonso";
+
+    for (size_t i = 0; i < 32 ; ++i) {
+        putchar(*((char *)*(data->payload) + i));
+    }
+
+    putchar('\n');
+    // fprintf(stdout, "age: %s\n", (*(Player *)(&(data->payload))).age);
+    // fprintf(stdout, "name: %s\n", (*(Player *)(&(data->payload))).name);
+
+    // (*(Player*)(data->payload)).age = 48;
+    // (*(Player*)(data->payload)).name = "Xavier";
+    // (*(Player*)(data->payload)).first_surname = "Belanche";
+    // (*(Player*)(data->payload)).last_surname = "Alonso";
+    // fprintf(stdout, "name:%s\n", (*(Player*)(data->payload)).age);
+
+    // Still don't understand how to do that...
     void *bucket = &(Bucket){0};
     void *entry = &(Entry){
         .name = "Júlia",

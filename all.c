@@ -1,24 +1,33 @@
+/*
+ * All: A (simple) linked list
+ *
+ * Use of this source code is governed by Public Domain
+ * license that can be found in the LICENSE file.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 #include "all.h"
 
-List *newList() {
+
+List *newList(void (*print)(List *)) {
     List *list = malloc(sizeof(List));
     list->head = NULL;
     list->n = 0;
+    assert(print && "Must declare a function");
+    list->printHeadData = print;
     return list;
 }
 
-Node *newNode(size_t data) {
+Node *newNode(void *data) {
     Node *node = malloc(sizeof(Node));
     node->data = data;
     node->next = NULL;
     return node;
 }
 
-int push(List *list, size_t data) {
-    Node *node = newNode(data);
+int push(List *list, Node *node) {
     node->next = list->head;
     list->head = node;
     list->n++;
@@ -33,9 +42,9 @@ int pop(List *list) {
     list->head = list->head->next;
     list->n--;
     free(remove);
-
     return 1;
 }
+/*
 
 Node *add(List *list, size_t data) {
     Node *node, *p;
@@ -165,12 +174,16 @@ static Node *sort_two_nodes(Node *frontNode, Node *backNode) {
 
     return (result);
 }
+*/
 
-// At this moment the code has been stolen from:
-// https://www.geeksforgeeks.org/merge-sort-for-linked-list/
-// TODO: Understand how merge sort algorithm is working
-// Maybe you can found a nice explanation at Wikipedia:
-// https://en.wikipedia.org/wiki/Merge_sort#Natural_merge_sort
+/*
+ * At this moment the code has been stolen from:
+ * https://www.geeksforgeeks.org/merge-sort-for-linked-list/
+ * TODO: Understand how merge sort algorithm is working
+ * Maybe you can found a nice explanation at Wikipedia:
+ * https://en.wikipedia.org/wiki/Merge_sort#Natural_merge_sort
+ */
+/*
 void sort(Node **headRef) {
     Node *head = *headRef;
     Node *frontNode;
@@ -185,3 +198,4 @@ void sort(Node **headRef) {
 
     *headRef = sort_two_nodes(frontNode, backNode);
 }
+*/
