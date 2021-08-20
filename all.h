@@ -28,7 +28,7 @@ typedef struct node {
 typedef struct list {
     size_t n;
     Node *head;
-    void (*printHeadData)(struct list *self);
+    void (*traverse)(struct list *self, void (*)(Node *));
     int (*compare)(void *value1, void *value2);
     void (*callback)(Node* data); // ok guys
 } List;
@@ -36,21 +36,29 @@ typedef struct list {
 /*
  * Create a new linked list
  */
-List *newList(void (*printData)(List*));
+List *newList(void (*traverse)(struct list*, void(*callback)(struct node*)));
 
 /*
- * Create a new Node
+ * Insert an element at one end of the stack called top.
  */
-Node *newNode(void *data);
-int push(List *list, Node* node);
-int pop(List *list);
-Node *add(List *list, size_t data);
-int delete(List *list);
-Node *insert_after(List *list, Node *prev, size_t data);
-Node *insert_before(List *list, Node *next, size_t data);
-Node *search(List *list, size_t data);
-void traverse(List *list, void (*callback)(Node* data));
-void printNode(Node *node);
-void sort(Node **headRef);
+int push(List *list, void *data);
+
+/*
+ * Return the element at the top of the stack without removing it, if the stack is not empty.
+ */
+
+Node *pop(List *list);
+
+/*
+ * Return the element at the top of the stack without removing it, if the stack is not empty.
+ */
+Node *peek(List *list);
+
+int add_after(List *list, Node *prev, void *data);
+// Node *add_before(List *list, Node *next, size_t data);
+// Node *search(List *list, size_t data);
+// void traverse(List *list, void (*callback)(Node* data));
+// void printNode(Node *node);
+// void sort(Node **headRef);
 
 #endif

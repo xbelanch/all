@@ -11,80 +11,59 @@
 #include "all.h"
 
 
-List *newList(void (*print)(List *)) {
+List *newList(void (*traverse)(List *list, void (*print)(Node *node))) {
     List *list = malloc(sizeof(List));
     list->head = NULL;
     list->n = 0;
-    assert(print && "Must declare a function");
-    list->printHeadData = print;
-    return list;
+    assert(traverse && "Must declare a function");
+    list->traverse = traverse;
+    return (list);
 }
 
-Node *newNode(void *data) {
+int push(List *list, void *data) {
     Node *node = malloc(sizeof(Node));
     node->data = data;
-    node->next = NULL;
-    return node;
-}
-
-int push(List *list, Node *node) {
     node->next = list->head;
     list->head = node;
     list->n++;
-    return 0;
+    return (0);
 }
 
-int pop(List *list) {
+Node *pop(List *list) {
     if (list->n == 0)
-        return 0;
+        return NULL;
 
     Node *remove = list->head;
     list->head = list->head->next;
     list->n--;
-    free(remove);
-    return 1;
-}
-/*
-
-Node *add(List *list, size_t data) {
-    Node *node, *p;
-    node = newNode(data);
-    if (list->head == NULL) {
-        list->head = node;
-    } else {
-        p = list->head;
-        while (p->next != NULL) {
-            p = p->next;
-        }
-        p->next = node;
-    }
-    list->n++;
-    return node;
+    return (remove);
 }
 
-int delete(List *list) {
-    return pop(list);
+Node *peek(List *list) {
+    if (list->n == 0)
+        return NULL;
+    return list->head;
 }
 
-Node *insert_after(List *list, Node *prev, size_t data) {
+int add_after(List *list, Node *prev, void *data) {
     Node *cursor = list->head;
     while (cursor != prev) {
         cursor = cursor->next;
     }
-
     if (cursor != NULL) {
-        Node *node = newNode(data);
+        Node *node = malloc(sizeof(Node));
+        node->data = data;
         if (cursor->next != NULL) {
             node->next = prev->next;
             prev->next = node;
         }
         list->n++;
-        return node;
+        return (0);
     } else {
-        return NULL;
+        return (1);
     }
 }
-
+/*
 Node *insert_before(List *list, Node *next, size_t data) {
     Node *cursor = list->head;
     Node *prev = NULL;
@@ -121,14 +100,6 @@ Node *search(List *list, size_t data) {
     }
 
     return NULL;
-}
-
-void traverse(List *list, callback func) {
-    Node* cursor = list->head;
-    while(cursor != NULL) {
-        func(cursor);
-        cursor = cursor->next;
-    }
 }
 
 void printNode(Node *node) {

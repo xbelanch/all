@@ -5,14 +5,37 @@
 #include "all.h"
 
 
-typedef struct _data{
+typedef struct data{
     char *name;
     char *surname;
 } Data;
 
-void printHeadData(List *list) {
-    Data *data = ((Data*)(list->head->data));
+void print(struct node *node) {
+    struct data *data = ((struct data*)(node->data));
     fprintf(stdout, "data: %s %s\n", data->name, data->surname);
+}
+
+void addstr(struct node *node){
+    struct data *data = ((struct data*)(node->data));
+    size_t len = strlen(data->surname);
+    char *new = malloc(sizeof(char) * len + 64);
+    memcpy(new, data->surname, len);
+    strcat(new, " Fernández");
+    data->surname = new;
+}
+
+void freeNode(struct node *node){
+    struct data *data = ((struct data*)(node->data));
+    data->name = 0;
+    data->surname = 0;
+}
+
+void traverse(struct list *list, void (*callback)(struct node *node)) {
+    struct node* cursor = list->head;
+    while(cursor != NULL) {
+        callback(cursor);
+        cursor = cursor->next;
+    }
 }
 
 int main(int argc, char *argv[])
@@ -20,24 +43,18 @@ int main(int argc, char *argv[])
     (void)argc;
     (void)argv[0];
 
-    List *list = newList(printHeadData);
-    push(list, newNode(&(Data){.name="Rotter", .surname="de Olanots"}));
-    push(list, newNode(&(Data){.name="Lyud", .surname="Pavlichenko"}));
-    push(list, newNode(&(Data){.name="Pucka", .surname="Coll"}));
-    list->printHeadData(list);
-    pop(list);
-    list->printHeadData(list);
+    List *list = newList(traverse);
+    push(list, &(Data){.name="Rotter", .surname="de Olanots"});
+    push(list, &(Data){.name="Lyud", .surname="Pavlichenko"});
+    push(list, &(Data){.name="Pucka", .surname="Coll"});
+    Node *node = peek(list);
+    add_after(list, node, &(Data){.name="Max", .surname="Carpone"});
 
-
-    // push(list, 12);
-    // add(list, 1000);
-    // insert_after(list, list->head, 330);
-    // insert_before(list, list->head, 101);
-    // insert_before(list, search(list, 330), 33);
-    // fprintf(stdout, "Head value before merge sort: %lu\n", list->head->data);
-    // sort(&list->head);
-    // traverse(list, printNode);
-    // fprintf(stdout, "Head value after merge sort: %lu\n", list->head->data);
-    // free(list);
+    // Example of how to use callbacks on traverse the linked list
+    list->traverse(list, addstr);
+    list->traverse(list, print);
+    list->traverse(list, freeNode);
+    list->traverse(list, print);
+    free(list);
     return 0;
 }
