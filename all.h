@@ -12,14 +12,6 @@
     exit(1); \
 }
 
-/*
- * TODO: Implement the abstract data type
- *
- * References:
- * - https://stackoverflow.com/questions/3274472/c-double-linked-list-with-abstract-data-type
- * - https://www.geeksforgeeks.org/abstract-data-types/
- */
-
 typedef struct node {
     struct node *next;
     void *data;
@@ -28,15 +20,16 @@ typedef struct node {
 typedef struct list {
     size_t n;
     Node *head;
-    void (*traverse)(struct list *self, void (*)(Node *));
-    int (*compare)(void *value1, void *value2);
-    void (*callback)(Node* data); // ok guys
+    void (*traverse)(struct list *, void (*)(struct node *));
+    int (*compare)(const void *, const void *value2);
+    void (*callback)(Node* data); //
 } List;
 
 /*
  * Create a new linked list
  */
-List *newList(void (*traverse)(struct list*, void(*callback)(struct node*)));
+List *newList(void (*traverse)(struct list*, void(*)(struct node*)),
+              int (*compare)(const void *a, const void *b));
 
 /*
  * Insert an element at one end of the stack called top.
@@ -55,10 +48,11 @@ Node *pop(List *list);
 Node *peek(List *list);
 
 int add_after(List *list, Node *prev, void *data);
-// Node *add_before(List *list, Node *next, size_t data);
-// Node *search(List *list, size_t data);
-// void traverse(List *list, void (*callback)(Node* data));
-// void printNode(Node *node);
+
+int add_before(List *list, Node *next, void *data);
+
+Node *get(List *list, void *data);
+
 // void sort(Node **headRef);
 
 #endif

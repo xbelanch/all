@@ -10,13 +10,15 @@
 #include <assert.h>
 #include "all.h"
 
-
-List *newList(void (*traverse)(List *list, void (*print)(Node *node))) {
+List *newList(void (*traverse)(List *list, void (*callback)(Node *)),
+              int (*compare)(const void *, const void *b)) {
     List *list = malloc(sizeof(List));
     list->head = NULL;
     list->n = 0;
-    assert(traverse && "Must declare a function");
+    assert(traverse && "Must declare a traverse function");
     list->traverse = traverse;
+    assert(compare && "You must declare a compare function");
+    list->compare = compare;
     return (list);
 }
 
@@ -63,8 +65,8 @@ int add_after(List *list, Node *prev, void *data) {
         return (1);
     }
 }
-/*
-Node *insert_before(List *list, Node *next, size_t data) {
+
+int add_before(List *list, Node *next, void *data) {
     Node *cursor = list->head;
     Node *prev = NULL;
     while (cursor != next) {
@@ -73,43 +75,35 @@ Node *insert_before(List *list, Node *next, size_t data) {
     }
 
     if (cursor != NULL) {
-        Node *node = newNode(data);
+        Node *node = malloc(sizeof(Node));
+        node->data = data;
         list->n++;
         if (prev == NULL) {
             // next equals to head list
             node->next = cursor;
             list->head = node;
-            return list->head;
         } else {
             node->next = cursor;
             prev->next = node;
-            return node;
         }
+        return (0);
     } else {
-        return NULL;
+        return (1);
     }
 }
 
-Node *search(List *list, size_t data) {
+Node *get(List *list, void *data) {
     Node *cursor = list->head;
     while (cursor != NULL) {
-        if (cursor->data == data) {
+        if (list->compare(cursor->data, data) == 0) {
             return cursor;
         }
         cursor = cursor->next;
     }
-
     return NULL;
 }
 
-void printNode(Node *node) {
-    if (node == NULL) {
-        fprintf(stderr, "Node with this data not found!\n");
-    } else {
-        fprintf(stdout, "data: %lu\n", node->data);
-    }
-}
-
+/*
 static void split_list(Node *head, Node **frontNode, Node **backNode) {
     Node *slow = head;
     Node *fast = head->next;
