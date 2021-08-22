@@ -47,12 +47,24 @@ Node *pop(List *list);
  */
 Node *peek(List *list);
 
+/*
+ * Insert a new node after a existing node from list.
+ */
 int add_after(List *list, Node *prev, void *data);
 
+/*
+ * Insert a new node before a existing node from list.
+ */
 int add_before(List *list, Node *next, void *data);
 
+/*
+ * Get a node from list given a data using compare function.
+ */
 Node *get(List *list, void *data);
 
-// void sort(Node **headRef);
+/*
+ * Sort list using compare function.
+ */
+void sort(List* list, Node **headRef);
 
 #endif

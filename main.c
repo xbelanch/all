@@ -35,13 +35,14 @@ void strcatRandomWord(struct node *node){
     data->surname = new;
 }
 
+// Callback needed: Compare surname between nodes
 int compare(const void *a, const void *b) {
     const struct data *da = a;
     const struct data *db = b;
     return strcmp(da->surname, db->surname);
 }
 
-// This callback is needed
+// Callback needed: traverse entire linked list
 void traverse(struct list *list, void (*callback)(struct node *node)) {
     struct node* cursor = list->head;
     while(cursor != NULL) {
@@ -61,27 +62,33 @@ int main(int argc, char *argv[])
     List *list = newList(traverse, compare);
 
     // Push some data onto this brand new list
-    push(list, &(Data){.name="Rotter", .surname="de Olanots"});
+    push(list, &(Data){.name="Rotter", .surname="Olanots"});
     push(list, &(Data){.name="Lyud", .surname="Pavlichenko"});
     push(list, &(Data){.name="Pucka", .surname="Coll"});
+    push(list, &(Data){.name="Bizcocha", .surname="Singluten"});
+    push(list, &(Data){.name="Pompa", .surname="Sircumstanchia"});
+    push(list, &(Data){.name="Floki", .surname="Rangarok"});
 
     // Get the peek node
     Node *node = peek(list);
-    add_after(list, node, &(Data){.name="Max", .surname="Carpone"});
+    add_after(list, node, &(Data){.name="Max", .surname="Karpone"});
 
     // Get a node that match with a given surname
-    node = get(list, &(struct data){.surname = "de Olanots"});
+    node = get(list, &(struct data){.name ="Pucka", .surname = "Coll"});
     if (node != NULL) {
         fprintf(stdout, "found: %s %s\n",
                 ((struct data*)node->data)->name,
                 ((struct data*)node->data)->surname
                 );
     } else {
-        panic("Not expected!");
+        panic("Given node data not found on list!");
     }
 
     // Add new node before the matched one
     add_before(list, node, &(Data){.name="Tomachito", .surname="Pomodoro"});
+
+    // Sort linked list nodes by compare its surname values
+    sort(list, &list->head);
 
     //  Callbacks! callbacks everywhere
     list->traverse(list, strcatRandomWord);

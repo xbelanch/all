@@ -93,6 +93,8 @@ int add_before(List *list, Node *next, void *data) {
 }
 
 Node *get(List *list, void *data) {
+    if (data == NULL)
+        panic("Cannot get any node from list because given data is NULL");
     Node *cursor = list->head;
     while (cursor != NULL) {
         if (list->compare(cursor->data, data) == 0) {
@@ -103,7 +105,6 @@ Node *get(List *list, void *data) {
     return NULL;
 }
 
-/*
 static void split_list(Node *head, Node **frontNode, Node **backNode) {
     Node *slow = head;
     Node *fast = head->next;
@@ -121,26 +122,6 @@ static void split_list(Node *head, Node **frontNode, Node **backNode) {
     slow->next = NULL;
 }
 
-static Node *sort_two_nodes(Node *frontNode, Node *backNode) {
-    Node *result = NULL;
-
-    if (frontNode == NULL)
-        return (backNode);
-    else if (backNode == NULL)
-        return (frontNode);
-
-    if (frontNode->data <= backNode->data) {
-        result = frontNode;
-        result->next = sort_two_nodes(frontNode->next, backNode);
-    } else {
-        result = backNode;
-        result->next = sort_two_nodes(frontNode, backNode->next);
-    }
-
-    return (result);
-}
-*/
-
 /*
  * At this moment the code has been stolen from:
  * https://www.geeksforgeeks.org/merge-sort-for-linked-list/
@@ -148,8 +129,30 @@ static Node *sort_two_nodes(Node *frontNode, Node *backNode) {
  * Maybe you can found a nice explanation at Wikipedia:
  * https://en.wikipedia.org/wiki/Merge_sort#Natural_merge_sort
  */
-/*
-void sort(Node **headRef) {
+
+static Node *sort_two_nodes(List *list, Node *frontNode, Node *backNode) {
+    Node *result = NULL;
+
+    if (frontNode == NULL)
+        return (backNode);
+    else if (backNode == NULL)
+        return (frontNode);
+
+    if (list->compare(frontNode->data, backNode->data) <= 0) {
+        result = frontNode;
+        result->next = sort_two_nodes(list, frontNode->next, backNode);
+    } else {
+        result = backNode;
+        result->next = sort_two_nodes(list, frontNode, backNode->next);
+    }
+
+    return (result);
+}
+
+void sort(List *list, Node **headRef) {
+    if (list == NULL || *headRef == NULL)
+        panic("PANIC: List or headRef are NULL");
+
     Node *head = *headRef;
     Node *frontNode;
     Node *backNode;
@@ -158,9 +161,8 @@ void sort(Node **headRef) {
         return;
 
     split_list(head, &frontNode, &backNode);
-    sort(&frontNode);
-    sort(&backNode);
+    sort(list, &frontNode);
+    sort(list, &backNode);
 
-    *headRef = sort_two_nodes(frontNode, backNode);
+    *headRef = sort_two_nodes(list, frontNode, backNode);
 }
-*/
